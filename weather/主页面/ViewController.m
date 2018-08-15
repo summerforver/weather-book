@@ -14,7 +14,7 @@
 #import "WeatherView.h"
 #import "FindViewController.h"
 
-@interface ViewController ()<UIScrollViewDelegate, twViewControllerDelegate>
+@interface ViewController ()<UIScrollViewDelegate, searchViewControllerDelegate>
 
 @end
 
@@ -23,12 +23,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-
+    
+    
+    
     _cityMutableArray = [[NSMutableArray alloc] init];
     [_cityMutableArray addObject:@"西安"];
     [_cityMutableArray addObject:@"北京"];
 //    [_cityMutableArray addObject:@"上海"];
-
+    
+    self.navigationController.navigationBarHidden = YES;
     
     _scrollView = [[UIScrollView alloc] init];
 
@@ -76,6 +79,8 @@
     }
     [self.view addSubview:_scrollView];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transport:) name:@"row" object:nil];
+    
 }
 
 - (void)clickAction:(UIPageControl *)page {
@@ -92,31 +97,40 @@
     
 }
 
+
+
 - (void)clickButton:(UIButton *)sender {
     SearchViewController *viewControl = [[SearchViewController alloc] init];
+
+    viewControl.searchMutableArray = self.cityMutableArray;
     
     viewControl.delegate = self;
     
-//    [self.navigationController pushViewController:viewControl animated:YES];
-    [self presentViewController:viewControl animated:YES completion:nil];
+    [self.navigationController pushViewController:viewControl animated:YES];
+//    [self presentViewController:viewControl animated:YES completion:nil];
+    
     
 }
 
 - (void)changeWithString:(NSString *)string {
+    
+    
     self.string = string;
+//     NSLog(@"%@", self.string);
     int flag = 1;
-    for (int i = 0; i <_cityMutableArray.count; i ++) {
+    for (int i = 0; i <_cityMutableArray.count-1; i ++) {
         if ([self.string isEqualToString:_cityMutableArray[i]]) {
             flag = 0;
         }
     }
-    
+//    NSLog(@"%d", flag);
     if (_cityMutableArray && flag == 1) {
         
-            [_cityMutableArray addObject:self.string];
+//            [_cityMutableArray addObject:self.string];
             NSInteger count = self.cityMutableArray.count;
         
-        
+//        NSLog(@"%ld",count );
+
             self.scrollView.contentSize = CGSizeMake(375*self.cityMutableArray.count, [UIScreen mainScreen].bounds.size.height - 40);
         
             WeatherView *weather = [[WeatherView alloc] initWithFrame:CGRectMake(375*(count-1), 0, [UIScreen mainScreen].bounds.size.width , self.scrollView.frame.size.height) addCityName:self.cityMutableArray[count-1]];
@@ -131,6 +145,23 @@
     }
 }
 
+- (void)transport:(NSNotification *)text {
+    
+    NSNumber *a = [[NSNumber alloc] init];
+    a = text.userInfo[@"number"];
+    
+    int i = [a intValue];
+    NSLog(@"%d",i);
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.scrollView setContentOffset:CGPointMake(self.scrollView.frame.size.width*i, 0) animated:NO];
+        
+        self.pageControl.currentPage = i;
+    }];
+    
+    
+    
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

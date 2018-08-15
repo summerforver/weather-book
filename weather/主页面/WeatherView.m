@@ -174,10 +174,16 @@
         NSArray *rightArray = [NSArray arrayWithObjects:@"日落", @"湿度", @"体感温度", @"气压", @"紫外线指数", nil];
         NSDictionary *dict = [[NSDictionary alloc] init];
         dict = _weatherMutableArray[0][@"daily_forecast"][0];
-
-        NSArray *leftMessageArray = [NSArray arrayWithObjects:dict[@"sr"],dict[@"pop"], dict[@"wind_dir"], dict[@"pcpn"], dict[@"vis"], nil];
         
-        NSArray *rightMessageArray = [NSArray arrayWithObjects:dict[@"ss"], dict[@"hum"], _weatherMutableArray[0][@"now"][@"fl"], dict[@"pres"], dict[@"uv_index"], nil];
+        
+        NSString *string2 = [NSString stringWithFormat:@"%@公里",dict[@"vis"]];
+        
+        NSArray *leftMessageArray = [NSArray arrayWithObjects:dict[@"sr"],dict[@"pop"], dict[@"wind_dir"], dict[@"pcpn"], string2, nil];
+        
+        NSString *string1 = [NSString stringWithFormat:@"%@°", _weatherMutableArray[0][@"now"][@"fl"]];
+        NSString *string3 = [NSString stringWithFormat:@"%@百帕",dict[@"pres"] ];
+    
+        NSArray *rightMessageArray = [NSArray arrayWithObjects:dict[@"ss"], dict[@"hum"], string1, string3, dict[@"uv_index"], nil];
         
         cell5.nameLabel.text = leftArray[indexPath.row];
         

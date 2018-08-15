@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol twViewControllerDelegate <NSObject>
+@protocol searchViewControllerDelegate <NSObject>
 
 //自定义方法来反向传值
 - (void)changeWithString:(NSString *)string;
@@ -29,6 +29,8 @@
 @property (nonatomic, copy)NSString *messageStr;
 @property (nonatomic, copy)NSString *tempStr;
 
-@property (nonatomic, weak) id <twViewControllerDelegate> delegate;
+@property (nonatomic, strong)NSMutableArray *searchMutableArray;
+
+@property (nonatomic, weak) id <searchViewControllerDelegate> delegate;
 
 @end
