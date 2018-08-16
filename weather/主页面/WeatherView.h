@@ -12,7 +12,15 @@
 
 @property (nonatomic, strong)UITableView *tableView;
 @property (nonatomic, strong)NSMutableArray *weatherMutableArray;
+@property (nonatomic, strong)NSMutableArray *hourMutableArray;
+@property (nonatomic, strong)NSMutableArray *tempMutableArray;
+@property (nonatomic, strong)NSMutableArray *imgMutableArray;
+@property (nonatomic, strong)NSMutableArray *tianqiMutableArray;
+@property (nonatomic, strong)NSMutableArray *abvMutableArray;
+@property (nonatomic, strong)UILabel *label;
 @property (nonatomic, copy)NSString *cityName;
+
+
 
 - (instancetype)initWithFrame:(CGRect)frame addCityName:(NSString *)cityname;
 @end

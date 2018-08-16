@@ -50,29 +50,10 @@
     
     [self.view addSubview:headView];
     
-   
-    
+  
 }
 
-//开始编辑的时候调用
-- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
-    
-    _mutableArray = [[NSMutableArray alloc] init];
-    
-    
-    
-    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 110, [UIScreen mainScreen].bounds.size.width,300) style:UITableViewStyleGrouped];
 
-    
-    _tableView.dataSource = self;
-    _tableView.delegate = self;
-    _tableView.showsHorizontalScrollIndicator = NO;
-    _tableView.backgroundColor = [UIColor clearColor];
-    
-    [self.view addSubview:_tableView];
-    
-
-}
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
@@ -134,44 +115,60 @@
     
     UITableViewCell *cell1 = [tableView cellForRowAtIndexPath:indexPath];
     _searchBar.text = cell1.textLabel.text;
-    
+    self.str = self.searchBar.text;
     [self.tableView setHidden:YES];
+    
+}
+//开始编辑的时候调用
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
+    
+    
+    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 110, [UIScreen mainScreen].bounds.size.width,300) style:UITableViewStyleGrouped];
+    
+    _tableView.dataSource = self;
+    _tableView.delegate = self;
+    _tableView.showsHorizontalScrollIndicator = NO;
+    _tableView.backgroundColor = [UIColor clearColor];
+    
+    [self.view addSubview:_tableView];
+    
     
 }
 
 //输入内容就会触发
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
     NSString *string = [NSString stringWithFormat:@"https://search.heweather.com/find?location=%@&key=6f50849b09364be0a651d52ee9473f54", searchBar.text];
-    
+
     string = [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-    
+
     NSURL *url = [NSURL URLWithString:string];
-    
+
     NSURLSession *session = [NSURLSession sharedSession];
-    
+
     NSURLSessionDataTask *dataTask = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-        
+
+
         if (data && error == nil) {
             NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-            
+
             self.mutableArray = dic[@"HeWeather6"][0][@"basic"];
 //            NSLog(@"----%@",self.mutableArray);
-            
+
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.tableView reloadData];
             }];
-            
+
         } else {
             NSLog(@"%@", error);
         }
-        
+
     }];
     [dataTask resume];
-    
+
 //    [self.tableView reloadData];
-    
+
 }
+
 
 //- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
 //    [self.tableView endEditing:YES];
@@ -193,14 +190,37 @@
 //点击搜索时执行的方法
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{
     
-    if ([_delegate respondsToSelector:@selector(changeWithString:)]) {
-        //代理传值
-//        NSLog(@"------%@",searchBar.text);
-        [_delegate changeWithString:searchBar.text];
+    
+    if (_mutableArray == nil) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"输入的城市不存在" message:@"请重新输入" preferredStyle:UIAlertControllerStyleAlert];
         
+        UIAlertAction *action = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            self.searchBar.text = @"";
+        }];
+        
+        [alertController addAction:action];
+        alertController.view.tintColor = [UIColor blackColor];
+        [self presentViewController:alertController animated:YES completion:nil];
+                                              
+                                              
+    } else {
+        if ([_delegate respondsToSelector:@selector(changeWithString:)]) {
+            //代理传值
+            //        NSLog(@"------%@",searchBar.text);
+            [_delegate changeWithString:searchBar.text];
+            
+        }
+        //    [self dismissViewControllerAnimated:YES completion:nil];
+        [self.navigationController popViewControllerAnimated:YES];
+        //    } else {
+        //
+        //
+        //
+        //    }
+
     }
-//    [self dismissViewControllerAnimated:YES completion:nil];
-    [self.navigationController popViewControllerAnimated:YES];
+    
+    
     
 }
 

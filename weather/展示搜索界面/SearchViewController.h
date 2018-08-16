@@ -11,12 +11,13 @@
 @protocol searchViewControllerDelegate <NSObject>
 
 //自定义方法来反向传值
-- (void)changeWithString:(NSString *)string;
+//- (void)changeWithString:(NSString *)string;
+- (void)changeWithArray:(NSMutableArray *)mutableArray;
 
 @end
 
 
-@interface SearchViewController : UIViewController<UITableViewDelegate, UITableViewDataSource>
+@interface SearchViewController : UIViewController
 @property (nonatomic, strong)UITableView *tableView;
 @property (nonatomic, strong)NSMutableArray *mutableArray;
 
@@ -30,6 +31,12 @@
 @property (nonatomic, copy)NSString *tempStr;
 
 @property (nonatomic, strong)NSMutableArray *searchMutableArray;
+@property (nonatomic, strong)NSMutableArray *dateMutableArray;
+@property (nonatomic, strong)NSMutableArray *rightMutableArray;
+
+
+@property (nonatomic, strong)NSMutableArray *timesMutableArray;
+
 
 @property (nonatomic, weak) id <searchViewControllerDelegate> delegate;
 

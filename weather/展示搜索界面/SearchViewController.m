@@ -11,7 +11,8 @@
 #import "FindViewController.h"
 #import "ViewController.h"
 
-@interface SearchViewController ()<twoViewControllerDelegate>
+@interface SearchViewController ()
+<UITableViewDelegate, UITableViewDataSource, twoViewControllerDelegate>
 
 @end
 
@@ -23,7 +24,14 @@
     self.view.backgroundColor = [UIColor colorWithRed:0.00f green:0.60f blue:0.80f alpha:1.00f];
     
 //    _mutableArray = [NSMutableArray arrayWithObjects:@"西安",@"北京", nil];
+//    self.messageMutableArray = [[NSMutableArray alloc] init];
+//    self.messageMutableArray = [[NSMutableArray alloc] init];
+//    self.tempMutableArray = [[NSMutableArray alloc] init];
+    
     self.mutableArray = self.searchMutableArray;
+    self.messageMutableArray = self.dateMutableArray;
+    self.tempMutableArray = self.rightMutableArray;
+    
     
 //    _messageMutableArray = [[NSMutableArray alloc] init];
 //    _messageMutableArray = [NSMutableArray arrayWithObjects:@"14:20",@"14:20",nil];8
@@ -45,6 +53,89 @@
     
 }
 
+- (void)changeWithString:(NSString *)string {
+    self.str = string;
+    
+    if (_timesMutableArray == nil) {
+        _timesMutableArray = [[NSMutableArray alloc] init];
+    }
+    [_timesMutableArray addObject:string];
+    NSLog(@"%@",_timesMutableArray);
+    
+    //    NSLog(@"%@",_timesMutableArray);
+    
+    int flag = 1;
+    for (int i = 0; i <_mutableArray.count; i ++) {
+        if ([self.str isEqualToString:_mutableArray[i]]) {
+            flag = 0;
+        }
+    }
+    
+    if (_mutableArray && flag == 1) {
+        
+        [_mutableArray addObject:self.str];
+        
+        //        for (int j = 0; j < _mutableArray.count; j++) {
+        
+        NSString *string1 = [NSString stringWithFormat:@"https://free-api.heweather.com/s6/weather?location=%@&key=6f50849b09364be0a651d52ee9473f54",self.str];
+        
+        string1 = [string1 stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        
+        NSURL *url = [NSURL URLWithString:string1];
+        
+        NSURLSession *session = [NSURLSession sharedSession];
+        
+        NSURLSessionDataTask *dataTask = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+            
+            
+            if (data && error == nil) {
+                NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                
+                //                    NSLog(@"%@", dic);
+                
+                self.messageStr = dic[@"HeWeather6"][0][@"update"][@"loc"];
+                
+                //                    NSLog(@"%@", self.messageStr);
+                //                    NSLog(@"%@", dic[@"HeWeather6"][0][@"update"][@"loc"]);
+                
+                
+                
+                self.tempStr = dic[@"HeWeather6"][0][@"now"][@"tmp"];
+                //                    NSLog(@"%@", dic[@"HeWeather6"][0][@"now"][@"tmp"]);
+                //                    NSLog(@"%@", self.tempStr);
+                
+                //                    if (self.messageMutableArray != nil && self.tempMutableArray != nil) {
+                
+                [self.messageMutableArray addObject:self.messageStr];
+                [self.tempMutableArray addObject:self.tempStr];
+                
+                //                    }
+                
+                //                    NSLog(@"%@", self.messageMutableArray);
+                
+                
+                //                    NSLog(@"%@", self.tempMutableArray);
+                
+                
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.tableView reloadData];
+                }];
+                
+            } else {
+                NSLog(@"%@", error);
+            }
+            
+        }];
+        [dataTask resume];
+        
+        //            [self.tableView reloadData];
+    }
+    
+    //        }
+    //
+    //    [self.tableView reloadData];
+    
+}
 
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -81,11 +172,22 @@
     if (indexPath.section == 0) {
         
         SearchTableViewCell *cell1 = [tableView dequeueReusableCellWithIdentifier:@"cell1"];
-//        cell1.firstLabel.text = _messageMutableArray[indexPath.row];
-        cell1.secondLabel.text = _mutableArray[indexPath.row];
+        if (_messageMutableArray != nil && ![_messageMutableArray isKindOfClass:[NSNull class]] && _messageMutableArray.count != 0) {
+            
+            cell1.firstLabel.text = _messageMutableArray[indexPath.row];
+        }
+        if (_mutableArray != nil && ![_mutableArray isKindOfClass:[NSNull class]] && _mutableArray.count != 0) {
+            
+            cell1.secondLabel.text = _mutableArray[indexPath.row];
+        }
+        if (_tempMutableArray != nil && ![_tempMutableArray isKindOfClass:[NSNull class]] && _tempMutableArray.count != 0) {
+            
+//            NSString *str = [NSString stringWithFormat:@"%@°",_tempMutableArray[indexPath.row]];
+            
+            cell1.thirdLabel.text = [NSString stringWithFormat:@"%@°",_tempMutableArray[indexPath.row]];
+        }
         
-//        NSString *str = [NSString stringWithFormat:@"%@°",_tempMutableArray[indexPath.row]];
-//        cell1.thirdLabel.text = str;
+        
 //        cell1.thirdLabel.text = _tempMutableArray[indexPath.row];
         cell1.backgroundColor = [UIColor clearColor];
         cell1.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -94,20 +196,22 @@
         UITableViewCell *cell2 = [tableView dequeueReusableCellWithIdentifier:@"cell2"];
         
         UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(330, 10, 30, 30)];
-        [button setImage:[UIImage imageNamed:@"1"] forState:UIControlStateNormal];
+        [button setImage:[UIImage imageNamed:@"11111"] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(clickButton:) forControlEvents:UIControlEventTouchDown];
         
         [cell2.contentView addSubview:button];
 //        cell2.textLabel.text = @"123";
         cell2.backgroundColor = [UIColor clearColor];
         cell2.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        cell2.selected = NO;
         return cell2;
     }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    
+  
 //    SearchTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell1"];
 //
 //    self.str = cell.textLabel.text;
@@ -123,13 +227,18 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"row" object:nil userInfo:dict];
     
     
-    if ([_delegate respondsToSelector:@selector(changeWithString:)]) {
-        //代理传值
-//        NSLog(@"%@",self.str);
-        [_delegate changeWithString:self.str];
-        
+//    if ([_delegate respondsToSelector:@selector(changeWithString:)]) {
+//        //代理传值
+////        NSLog(@"%@",self.str);
+//        [_delegate changeWithString:self.str];
+//
+//    }
+//
+    NSLog(@"111%@",_timesMutableArray);
+    if ([_delegate respondsToSelector:@selector(changeWithArray:)]) {
+        [_delegate changeWithArray:_timesMutableArray];
     }
-    
+//
 //    [self dismissViewControllerAnimated:YES completion:nil];
         [self.navigationController popViewControllerAnimated:YES];
     
@@ -149,83 +258,6 @@
     
 }
 
-- (void)changeWithString:(NSString *)string {
-     self.str = string;
-//    NSLog(@"%@",self.str);
-//    [_mutableArray addObject:self.str];
-//
-    int flag = 1;
-    for (int i = 0; i <_mutableArray.count; i ++) {
-        if ([self.str isEqualToString:_mutableArray[i]]) {
-            flag = 0;
-        }
-    }
-
-    if (_mutableArray && flag == 1) {
-        
-         [_mutableArray addObject:self.str];
-
-//        for (int j = 0; j < _mutableArray.count; j++) {
-
-//            NSString *string1 = [NSString stringWithFormat:@"https://free-api.heweather.com/s6/weather?location=%@&key=6f50849b09364be0a651d52ee9473f54",self.str];
-//
-//            string1 = [string1 stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-//
-//            NSURL *url = [NSURL URLWithString:string1];
-//
-//            NSURLSession *session = [NSURLSession sharedSession];
-//
-//            NSURLSessionDataTask *dataTask = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-//
-//
-//                if (data && error == nil) {
-//                    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-//
-////                    NSLog(@"%@", dic);
-//
-//                    self.messageStr = dic[@"HeWeather6"][0][@"update"][@"loc"];
-//
-////                    NSLog(@"%@", self.messageStr);
-////                    NSLog(@"%@", dic[@"HeWeather6"][0][@"update"][@"loc"]);
-//
-//
-//
-//                    self.tempStr = dic[@"HeWeather6"][0][@"now"][@"tmp"];
-////                    NSLog(@"%@", dic[@"HeWeather6"][0][@"now"][@"tmp"]);
-////                    NSLog(@"%@", self.tempStr);
-//
-////                    if (self.messageMutableArray != nil && self.tempMutableArray != nil) {
-//
-//                        [self.messageMutableArray addObject:self.messageStr];
-//                        [self.tempMutableArray addObject:self.tempStr];
-//
-////                    }
-//
-//                    NSLog(@"%@", self.messageMutableArray);
-//
-//
-//                    NSLog(@"%@", self.tempMutableArray);
-//
-//
-//                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-//                        [self.tableView reloadData];
-//                    }];
-//
-//                } else {
-//                    NSLog(@"%@", error);
-//                }
-//
-//            }];
-//            [dataTask resume];
-        
-//            [self.tableView reloadData];
-        }
-
-//        }
-//
-    [self.tableView reloadData];
-
-}
 
 
 

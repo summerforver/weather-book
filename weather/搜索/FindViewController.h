@@ -21,7 +21,7 @@
 @property (nonatomic, strong)NSMutableArray *mutableArray;
 //@property (nonatomic, strong)NSMutableArray *array;
 
-//@property (nonatomic, strong)NSString *str;
+@property (nonatomic, copy)NSString *str;
 
 @property (nonatomic, weak) id <twoViewControllerDelegate> delegate;
 @end

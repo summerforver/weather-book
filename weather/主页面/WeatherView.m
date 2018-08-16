@@ -10,6 +10,7 @@
 #import "HeadViewTableViewCell.h"
 #import "SevenWeatherTableViewCell.h"
 #import "FootTableViewCell.h"
+#import "EveryHour.h"
 
 @interface WeatherView ()<UITableViewDelegate,UITableViewDataSource>
 
@@ -21,7 +22,12 @@
     if (self = [super initWithFrame:frame]) {
 
         [self creatWeb:cityname];
+        
+//        [self creatInternetRequest:cityname];
+        
         [self addTableView];
+        
+        
         
     }
     return self;
@@ -48,6 +54,7 @@
             self.weatherMutableArray = [[NSMutableArray alloc] init];
             self.weatherMutableArray = dic[@"HeWeather6"];
             
+            
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.tableView reloadData];
             }];
@@ -61,6 +68,64 @@
     [dataTask resume];
 }
 
+- (void)creatInternetRequest:(NSString *)cityname{
+    
+    NSString *string1 = [NSString stringWithFormat:@"https://api.jisuapi.com/weather/query?appkey=1c40a96656a7763e&city=%@",cityname];
+    
+    NSString *urlString1 = [[NSString alloc] init];
+    urlString1 = [string1 stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    
+    NSURL *url1 = [NSURL URLWithString:urlString1];
+    
+    NSURLSession *session1 = [NSURLSession sharedSession];
+    
+    NSURLSessionDataTask *dataTask1 = [session1 dataTaskWithURL:url1 completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+        if (data) {
+            NSDictionary *dic1 = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            //            NSLog(@"%@", dic);
+            
+            self.hourMutableArray = [[NSMutableArray alloc] init];
+            self.tianqiMutableArray = [[NSMutableArray alloc] init];
+            self.imgMutableArray = [[NSMutableArray alloc] init];
+            self.tempMutableArray = [[NSMutableArray alloc] init];
+//            self.hourMutableArray = dic1[@"result"][@"hourly"];
+            for (int i = 0; i < 24; i++) {
+                
+                [self.hourMutableArray addObject:dic1[@"result"][@"hourly"][i][@"time"]];
+                
+                [self.tianqiMutableArray addObject:dic1[@"result"][@"hourly"][i][@"weather"]];
+                
+                [self.imgMutableArray addObject:dic1[@"result"][@"hourly"][i][@"img"]];
+                [self.tempMutableArray addObject:dic1[@"result"][@"hourly"][i][@"temp"]];
+                
+            }
+        
+            
+//            NSLog(@"------%@",self.hourMutableArray);
+            
+//
+//            NSLog(@"=====%@",self.tianqiMutableArray);
+            
+//            NSLog(@"%@",self.imgMutableArray);
+            
+//            NSLog(@"%@",self.tempMutableArray);
+            
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+//                NSLog(@"24242");
+                [self.tableView reloadData];
+            }];
+            
+        } else {
+            NSLog(@"%@", error);
+        }
+        
+    }];
+    
+    [dataTask1 resume];
+}
+
 - (void)setCityName:(NSString *)cityName {
     _cityName = cityName;
     
@@ -70,18 +135,19 @@
 
 - (void)addTableView{
     
-    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 50, [UIScreen mainScreen].bounds.size.width,self.frame.size.height-55) style:UITableViewStyleGrouped];
+    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 50, [UIScreen mainScreen].bounds.size.width,self.frame.size.height-55) style:UITableViewStylePlain];
     
     [_tableView registerClass:[HeadViewTableViewCell class] forCellReuseIdentifier:@"cell1"];
     [_tableView registerClass:[SevenWeatherTableViewCell class] forCellReuseIdentifier:@"cell3"];
-    [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell4"];
+//    [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell4"];
     [_tableView registerClass:[FootTableViewCell class] forCellReuseIdentifier:@"cell5"];
-    [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+//    [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
     
     _tableView.dataSource = self;
     _tableView.delegate = self;
     _tableView.showsHorizontalScrollIndicator = NO;
     _tableView.backgroundColor = [UIColor clearColor];
+    
     
     [self addSubview:_tableView];
     
@@ -136,7 +202,6 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     
-    
     if (indexPath.section == 0) {
         HeadViewTableViewCell *cell1 = [tableView dequeueReusableCellWithIdentifier:@"cell1" forIndexPath:indexPath];
         
@@ -153,6 +218,7 @@
         
         cell1.backgroundColor = [UIColor clearColor];
         cell1.selectionStyle = UITableViewCellSelectionStyleNone;
+        
         return cell1;
     } else if (indexPath.section == 2){
         NSArray *array = [[NSArray alloc] init];
@@ -177,13 +243,17 @@
         
         
         NSString *string2 = [NSString stringWithFormat:@"%@公里",dict[@"vis"]];
-        
-        NSArray *leftMessageArray = [NSArray arrayWithObjects:dict[@"sr"],dict[@"pop"], dict[@"wind_dir"], dict[@"pcpn"], string2, nil];
+        NSString *str = [[NSString alloc] init];
+        str = @"%";
+        NSString *string4 = [NSString stringWithFormat:@"%@%@", dict[@"pop"],str];
+
+        NSArray *leftMessageArray = [NSArray arrayWithObjects:dict[@"sr"],string4, dict[@"wind_dir"], dict[@"pcpn"], string2, nil];
         
         NSString *string1 = [NSString stringWithFormat:@"%@°", _weatherMutableArray[0][@"now"][@"fl"]];
         NSString *string3 = [NSString stringWithFormat:@"%@百帕",dict[@"pres"] ];
+        NSString *string5 = [NSString stringWithFormat:@"%@%@", dict[@"hum"],str];
     
-        NSArray *rightMessageArray = [NSArray arrayWithObjects:dict[@"ss"], dict[@"hum"], string1, string3, dict[@"uv_index"], nil];
+        NSArray *rightMessageArray = [NSArray arrayWithObjects:dict[@"ss"], string5, string1, string3, dict[@"uv_index"], nil];
         
         cell5.nameLabel.text = leftArray[indexPath.row];
         
@@ -203,13 +273,18 @@
         
     } else if (indexPath.section == 3) {
         UITableViewCell *cell4 = [tableView dequeueReusableCellWithIdentifier:@"cell4"];
+        if (cell4 == nil) {
+            cell4 = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell4"];
+            _label = [[UILabel alloc] initWithFrame:CGRectMake(20, 7, 330, 60)];
+            _label.numberOfLines = 0;
+            _label.textColor = [UIColor whiteColor];
+            
+            _label.font = [UIFont systemFontOfSize:16.0];
+            [cell4.contentView addSubview:_label];
+            
+        }
+        _label.text = _weatherMutableArray[0][@"lifestyle"][0][@"txt"];
         
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20, 7, 330, 60)];
-        label.numberOfLines = 0;
-        label.textColor = [UIColor whiteColor];
-        label.text = _weatherMutableArray[0][@"lifestyle"][0][@"txt"];
-        label.font = [UIFont systemFontOfSize:16.0];
-        [cell4.contentView addSubview:label];
         
         cell4.backgroundColor = [UIColor clearColor];
         cell4.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -217,7 +292,47 @@
     }
     else {
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-        cell.textLabel.text = @"123";
+//        cell.textLabel.text = @"123";
+        
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+            
+            UIScrollView *scrollerView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 375, 120)];
+            
+            scrollerView.indicatorStyle = UIScrollViewIndicatorStyleDefault;
+            scrollerView.pagingEnabled = YES;
+            scrollerView.scrollEnabled = YES;
+            scrollerView.showsHorizontalScrollIndicator = NO;
+            scrollerView.bounces = YES;
+       
+            scrollerView.contentSize = CGSizeMake(62*24, 120);
+
+            [cell.contentView addSubview:scrollerView];
+
+            _abvMutableArray = [[NSMutableArray alloc]init];
+            
+            for (int i = 0; i < 24; i ++) {
+                
+                EveryHour *view = [[EveryHour alloc] init];
+                
+                view.frame = CGRectMake(62*i, 0, 62, 120);
+                
+                [scrollerView addSubview:view];
+                [_abvMutableArray addObject:view];
+                
+            }
+        }
+        //scrollView数据源
+        for (int i = 0; i < 24; i ++) {
+            EveryHour *view = [_abvMutableArray objectAtIndex:i];
+            
+            if (i == 0) {
+                [view setDataTimeLabel:@" 现在" addImageView:[UIImage imageNamed:_imgMutableArray[i]] addWeather:_tianqiMutableArray[i] addTemLabel: [NSString stringWithFormat:@"%@°",_tempMutableArray[i]]];
+            } else {
+                [view setDataTimeLabel: _hourMutableArray[i] addImageView:[UIImage imageNamed:_imgMutableArray[i]] addWeather:_tianqiMutableArray[i] addTemLabel: [NSString stringWithFormat:@"%@°",_tempMutableArray[i]]];
+                
+            }
+        }
         
         
         cell.backgroundColor = [UIColor clearColor];
