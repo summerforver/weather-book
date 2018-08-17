@@ -21,9 +21,6 @@
         
         _thirdLabel = [[UILabel alloc] init];
         [self.contentView addSubview:_thirdLabel];
-        
-
-        
     }
     return self;
 }

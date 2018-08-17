@@ -13,14 +13,13 @@
 @property (nonatomic, strong)UIPageControl *pageControl;
 
 @property (nonatomic, strong)NSMutableArray *cityMutableArray;
-
-@property (nonatomic, strong)NSMutableArray *array;
-//@property (nonatomic, copy)NSString *string;
-@property (nonatomic, copy)NSString *messageStr;
-@property (nonatomic, copy)NSString *tempStr;
-
+@property (nonatomic, strong)NSMutableArray *importantMutableArray;
 @property (nonatomic, strong)NSMutableArray *timeMutableArray;
 @property (nonatomic, strong)NSMutableArray *tempterMutableArray;
+@property (nonatomic, strong)NSMutableArray *array;
+
+@property (nonatomic, copy)NSString *messageStr;
+@property (nonatomic, copy)NSString *tempStr;
 
 @end
 

@@ -23,7 +23,7 @@
 
         [self creatWeb:cityname];
         
-//        [self creatInternetRequest:cityname];
+        [self creatInternetRequest:cityname];
         
         [self addTableView];
         
@@ -49,8 +49,6 @@
         
         if (data && error == nil) {
             NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-//            NSLog(@"%@", dic);
-            
             self.weatherMutableArray = [[NSMutableArray alloc] init];
             self.weatherMutableArray = dic[@"HeWeather6"];
             
@@ -83,13 +81,11 @@
         
         if (data) {
             NSDictionary *dic1 = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-            //            NSLog(@"%@", dic);
-            
+
             self.hourMutableArray = [[NSMutableArray alloc] init];
             self.tianqiMutableArray = [[NSMutableArray alloc] init];
             self.imgMutableArray = [[NSMutableArray alloc] init];
             self.tempMutableArray = [[NSMutableArray alloc] init];
-//            self.hourMutableArray = dic1[@"result"][@"hourly"];
             for (int i = 0; i < 24; i++) {
                 
                 [self.hourMutableArray addObject:dic1[@"result"][@"hourly"][i][@"time"]];
@@ -101,19 +97,7 @@
                 
             }
         
-            
-//            NSLog(@"------%@",self.hourMutableArray);
-            
-//
-//            NSLog(@"=====%@",self.tianqiMutableArray);
-            
-//            NSLog(@"%@",self.imgMutableArray);
-            
-//            NSLog(@"%@",self.tempMutableArray);
-            
-            
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-//                NSLog(@"24242");
                 [self.tableView reloadData];
             }];
             
@@ -292,8 +276,6 @@
     }
     else {
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-//        cell.textLabel.text = @"123";
-        
         if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
             

@@ -19,8 +19,6 @@
 @property (nonatomic, strong)UITableView *tableView;
 @property (nonatomic, strong)UISearchBar *searchBar;
 @property (nonatomic, strong)NSMutableArray *mutableArray;
-//@property (nonatomic, strong)NSMutableArray *array;
-
 @property (nonatomic, copy)NSString *str;
 
 @property (nonatomic, weak) id <twoViewControllerDelegate> delegate;

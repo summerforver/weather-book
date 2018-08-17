@@ -34,8 +34,6 @@
         _temLabel.font = [UIFont systemFontOfSize:18.0];
         [self addSubview:_temLabel];
         
-       
-        
     }
     return self;
 }

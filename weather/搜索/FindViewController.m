@@ -33,8 +33,7 @@
     
     _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(15, 60, 300, 40)];
     _searchBar.backgroundColor = [UIColor colorWithRed:0.12f green:0.19f blue:0.23f alpha:1.00f];
-//    searchbar.barStyle =  UIBarStyleBlack;
-//    searchbar.searchBarStyle = UISearchBarStyleMinimal;
+
     _searchBar.barStyle = UISearchBarIconSearch;
     _searchBar.layer.masksToBounds = YES;
     _searchBar.layer.cornerRadius = 7;
@@ -100,9 +99,6 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
     }
-//    NSString *string = [NSString stringWithFormat:@"%@             %@",_mutableArray[indexPath.row][@"location"], _mutableArray[indexPath.row][@"parent_city"]];
-//    cell.textLabel.text = string;
-    
     cell.textLabel.text = _mutableArray[indexPath.row][@"location"];
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -121,8 +117,7 @@
 }
 //开始编辑的时候调用
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
-    
-    
+
     _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 110, [UIScreen mainScreen].bounds.size.width,300) style:UITableViewStyleGrouped];
     
     _tableView.dataSource = self;
@@ -131,8 +126,7 @@
     _tableView.backgroundColor = [UIColor clearColor];
     
     [self.view addSubview:_tableView];
-    
-    
+
 }
 
 //输入内容就会触发
@@ -152,7 +146,6 @@
             NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
 
             self.mutableArray = dic[@"HeWeather6"][0][@"basic"];
-//            NSLog(@"----%@",self.mutableArray);
 
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.tableView reloadData];
@@ -165,31 +158,10 @@
     }];
     [dataTask resume];
 
-//    [self.tableView reloadData];
-
 }
-
-
-//- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-//    [self.tableView endEditing:YES];
-//}
-
-////在搜索框修改搜索内容时触发
-//- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar {
-//     [self.tableView reloadData];
-//    return YES;
-//
-//}
-
-//- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
-////    [self.tableView reloadData];
-//    NSLog(@"输入搜索内容完毕");
-//}
-
 
 //点击搜索时执行的方法
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{
-    
     
     if (_mutableArray == nil) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"输入的城市不存在" message:@"请重新输入" preferredStyle:UIAlertControllerStyleAlert];
@@ -201,27 +173,14 @@
         [alertController addAction:action];
         alertController.view.tintColor = [UIColor blackColor];
         [self presentViewController:alertController animated:YES completion:nil];
-                                              
-                                              
     } else {
         if ([_delegate respondsToSelector:@selector(changeWithString:)]) {
             //代理传值
-            //        NSLog(@"------%@",searchBar.text);
             [_delegate changeWithString:searchBar.text];
             
         }
-        //    [self dismissViewControllerAnimated:YES completion:nil];
         [self.navigationController popViewControllerAnimated:YES];
-        //    } else {
-        //
-        //
-        //
-        //    }
-
     }
-    
-    
-    
 }
 
 - (void)click:(UIButton *)sender {
